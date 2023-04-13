@@ -4,6 +4,7 @@ import com.demo.entity.Message;
 import com.demo.entity.User;
 import com.demo.entity.vo.MessageVo;
 import com.demo.repository.MessageRepository;
+import com.demo.repository.UserRepository;
 import com.demo.service.MessageService;
 import com.demo.service.MessageVoService;
 import com.demo.service.UserService;
@@ -33,8 +34,8 @@ public class MessageServiceTest {
     @Autowired
     private MessageVoService messageVoService;
 
-    @Mock
-    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -42,13 +43,13 @@ public class MessageServiceTest {
     @Before
     public void setup(){
         User user = new User(1, "test_only", "test_only", "1", null, null, 0, null);
-        userService.create(user);
+        userRepository.save(user);
     }
 
     @Test
     void findByUser() {
         String userID = "test_only";
-        String content = "unit test create";
+        String content = "unit test findByUser";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
         messageRepository.save(message);
         messageRepository.save(message);
@@ -88,15 +89,12 @@ public class MessageServiceTest {
     @Test
     void delById() {
         String userID = "test_only";
-        Iterator<Message> expectedMessageList = messageRepository.findMessageByUserID(userID).iterator();
-        for (Iterator<Message> it = expectedMessageList; it.hasNext(); ) {
-            Message expected = it.next();
-            Integer expectedMessageID = expected.getMessageID();
-            messageService.delById(expectedMessageID);
-
-            Optional<Message> message = messageRepository.findById(expectedMessageID);
-            Assert.assertFalse(message.isPresent());
-        }
+        String content = "unit test delById";
+        Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
+        Integer actualMessageID = messageService.create(message);
+        Assert.assertTrue(messageRepository.findById(actualMessageID).isPresent());
+        messageService.delById(actualMessageID);
+        Assert.assertFalse(messageRepository.findById(actualMessageID).isPresent());
     }
 
 
