@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 
 @Repository
 public interface VenueRepository extends CrudRepository <Venue,Integer>{
-    Venue findVenueByVunueID(int venueID);
+    Venue findVenueByVenueID(int venueID);
     @Modifying
     @Transactional
     Iterable<Venue> deleteVenueByVenueID(int venueID);

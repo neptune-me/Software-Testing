@@ -99,7 +99,7 @@ public class VenueServiceTest {
 
         venue.setClose_time("17:00");
         venueRepository.save(venue);
-        int venueID = venueRepository.findVenueByVunueID(222).getVenueID();
+        int venueID = venueRepository.findVenueByVenueID(222).getVenueID();
         venueService.delById(venueID);
         Assert.assertFalse(venueRepository.findById(venueID).isPresent());
     }
