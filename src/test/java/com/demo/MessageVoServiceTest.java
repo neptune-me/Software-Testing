@@ -60,13 +60,7 @@ public class MessageVoServiceTest {
         String content = "unit test returnVo";
         List<Message> messageList = new ArrayList<>();
         List<Integer> messageIdList = new ArrayList<>();
-        for (int i = 0; i < 5; i ++) {
-            Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
-            Integer actualMessageID = messageService.create(message);
-            message.setMessageID(actualMessageID);
-            messageList.add(message);
-            messageIdList.add(actualMessageID);
-        }
+
 
         List<MessageVo> actualMessageVoList = messageVoService.returnVo(messageList);
         for (int i = 0; i < 5; i ++) {

@@ -29,7 +29,7 @@ public class OrderServiceTest {
     public void testFindById() {
         Order order = orderService.findById(1);
         Assert.assertNotNull(order);
-        Assert.assertEquals(1, order.getId());
+        Assert.assertEquals(1, order.getOrderID());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class OrderServiceTest {
         order.setUserID("test");
         order.setVenueID(16);
         orderRepository.save(order);
-        int orderID=orderRepository.findByOrderId(500).getId();
+        int orderID=orderRepository.findByOrderId(500).getOrderID();
         orderService.delOrder(orderID);
         Assert.assertFalse(orderRepository.findById(orderID).isPresent());
     }
@@ -91,7 +91,7 @@ public class OrderServiceTest {
         //int orderID = 1;//state=2已审核未完成
         Order order = new Order();
         order.setOrderID(1);
-        int orderID=orderRepository.findByOrderId(1).getId();
+        int orderID=orderRepository.findByOrderId(1).getOrderID();
         order.setState(1);
         orderService.confirmOrder(orderID);
         Assert.assertEquals(2, orderService.findById(orderID).getState());
@@ -101,7 +101,7 @@ public class OrderServiceTest {
     public void testFinishOrder() {
         Order order = new Order();
         order.setOrderID(1);
-        int orderID=orderRepository.findByOrderId(1).getId();
+        int orderID=orderRepository.findByOrderId(1).getOrderID();
         order.setState(2);
         orderService.confirmOrder(orderID);
         orderService.finishOrder(orderID);
@@ -112,7 +112,7 @@ public class OrderServiceTest {
     public void testRejectOrder() {
         Order order = new Order();
         order.setOrderID(1);
-        int orderID=orderRepository.findByOrderId(1).getId();
+        int orderID=orderRepository.findByOrderId(1).getOrderID();
         order.setState(3);
         orderService.rejectOrder(orderID);
         Assert.assertEquals(4, orderService.findById(orderID).getState());
