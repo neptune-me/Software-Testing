@@ -3,18 +3,22 @@ package com.demo.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.tomcat.jni.Local;
+import org.hibernate.annotations.Proxy;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="`order`")
+@Proxy(lazy = false)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

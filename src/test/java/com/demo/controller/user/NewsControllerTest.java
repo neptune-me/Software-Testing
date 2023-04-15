@@ -34,7 +34,7 @@ class NewsControllerTest {
     @Test
     void news() throws Exception {
         // 创建一个News对象作为模拟数据
-        News news = new News(1,1, "标题1", "内容1", LocalDateTime.of(2023, 4, 13, 15, 30));
+        News news = new News(1, "标题1", "内容1", LocalDateTime.of(2023, 4, 13, 15, 30));
 
         // 使用when方法来指定newsService.findById方法的返回值
         when(newsService.findById(1)).thenReturn(news);
@@ -59,7 +59,7 @@ class NewsControllerTest {
     void testNews_list() throws Exception{
         Pageable news_pageable= PageRequest.of(0,5, Sort.by("time").descending());
         List<News> news = new ArrayList<>();
-        News news1 = new News(1,1, "标题1", "内容1", LocalDateTime.of(2023, 4, 13, 15, 30));
+        News news1 = new News(1, "标题1", "内容1", LocalDateTime.of(2023, 4, 13, 15, 30));
         news.add(news1);
         when(newsService.findAll(news_pageable)).thenReturn(new PageImpl<>(news,news_pageable,1));
 

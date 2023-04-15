@@ -15,7 +15,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message findById(int messageID) {
-        return messageDao.getOne(messageID);
+        return messageDao.findById(messageID).orElse(null);
     }
 
     @Override
