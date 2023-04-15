@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void submit(String venueName, LocalDateTime startTime, int hours, String userID) {
+    public Order submit(String venueName, LocalDateTime startTime, int hours, String userID) {
 
         Venue venue =venueDao.findByVenueName(venueName);
 
@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStartTime(startTime);
         order.setUserID(userID);
         order.setTotal(hours* venue.getPrice());
-        orderDao.save(order);
+        return orderDao.save(order);
     }
 
     @Override

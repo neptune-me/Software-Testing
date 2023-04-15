@@ -34,11 +34,8 @@ public interface OrderService {
     void updateOrder(int orderID,String venueName, LocalDateTime startTime, int hours, String userID);
     /**
      * 新建订单
-     * @param venueName
-     * @param startTime
-     * @param hours
      */
-    void submit(String venueName, LocalDateTime startTime, int hours, String userID);
+    Order submit(String venueName, LocalDateTime startTime, int hours, String userID);
 
     /**
      * 删除订单
