@@ -1,9 +1,9 @@
 package com.demo;
 
+import com.demo.dao.MessageDao;
 import com.demo.entity.Message;
 import com.demo.entity.User;
 import com.demo.entity.vo.MessageVo;
-import com.demo.repository.MessageRepository;
 import com.demo.service.MessageService;
 import com.demo.service.MessageVoService;
 import org.junit.After;
@@ -31,7 +31,7 @@ public class MessageVoServiceTest {
 
 
     @Autowired
-    private MessageRepository messageRepository;
+    private MessageDao messageDao;
 
     @Before
     public void setup(){
@@ -51,7 +51,7 @@ public class MessageVoServiceTest {
         Assert.assertEquals(userID, actualMessageVo.getUserID());
         Assert.assertEquals(1, actualMessageVo.getState());
 
-        messageRepository.deleteById(actualMessageID);
+        messageDao.deleteById(actualMessageID);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class MessageVoServiceTest {
             Assert.assertEquals(content, actualMessageVo.getContent());
             Assert.assertEquals(userID, actualMessageVo.getUserID());
             Assert.assertEquals(1, actualMessageVo.getState());
-            messageRepository.deleteById(actualMessageVo.getMessageID());
+            messageDao.deleteById(actualMessageVo.getMessageID());
         }
 
     }

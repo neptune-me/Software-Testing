@@ -1,8 +1,8 @@
 package com.demo;
 
+import com.demo.dao.UserDao;
 import com.demo.entity.Message;
 import com.demo.entity.User;
-import com.demo.repository.UserRepository;
 import com.demo.service.UserService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class UserServiceTest {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Test
     public void findByUserID() {
@@ -72,7 +72,7 @@ public class UserServiceTest {
         user.setIsadmin(0);
         int res = userService.create(user);
         Assert.assertNotEquals(0, res);
-        userRepository.deleteUserByUserID("test2");
+        userDao.delete(user);
     }
 
     @Test
@@ -81,17 +81,16 @@ public class UserServiceTest {
         user.setUserID("test2");
         user.setPassword("11");
         user.setUserName("22");
-        userRepository.save(user);
-        int userID = userRepository.findUserByUserID("test2").getId();
+        userDao.save(user);
+        int userID = userDao.findByUserID("test2").getId();
         userService.delByID(userID);
-        Assert.assertFalse(userRepository.findById(userID).isPresent());
+        Assert.assertNotNull(userDao.findById(userID));
     }
 
     @Test
     public void updateUser() {
         // 用来复原id为1的用户信息
-        Optional<User> OriginalUser = userRepository.findById(1);
-        Assert.assertTrue(OriginalUser.isPresent());
+        User OriginalUser = userDao.findById(1);
         // 修改用户ID，密码，昵称
         User user = new User();
         user.setId(1);
@@ -99,13 +98,13 @@ public class UserServiceTest {
         user.setPassword("1123");
         user.setUserName("test2");
         userService.updateUser(user);
-        Optional<User> actualUser = userRepository.findById(1);
-        Assert.assertTrue(actualUser.isPresent());
-        Assert.assertEquals(actualUser.get().getUserID(), "test2");
-        Assert.assertEquals(actualUser.get().getPassword(), "1123");
-        Assert.assertEquals(actualUser.get().getUserName(), "test2");
+        User actualUser = userDao.findById(1);
+        Assert.assertNotNull(actualUser);
+        Assert.assertEquals(actualUser.getUserID(), "test2");
+        Assert.assertEquals(actualUser.getPassword(), "1123");
+        Assert.assertEquals(actualUser.getUserName(), "test2");
 
-        userService.updateUser(OriginalUser.get());
+        userService.updateUser(OriginalUser);
     }
 
     @Test

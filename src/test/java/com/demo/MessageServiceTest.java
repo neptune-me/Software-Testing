@@ -1,18 +1,17 @@
 package com.demo;
 
+import com.demo.dao.MessageDao;
+import com.demo.dao.UserDao;
 import com.demo.entity.Message;
 import com.demo.entity.User;
 import com.demo.entity.vo.MessageVo;
-import com.demo.repository.MessageRepository;
-import com.demo.repository.UserRepository;
 import com.demo.service.MessageService;
 import com.demo.service.MessageVoService;
-import com.demo.service.UserService;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -35,95 +33,95 @@ public class MessageServiceTest {
     private MessageVoService messageVoService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Autowired
-    private MessageRepository messageRepository;
+    private MessageDao messageDao;
 
     @Before
     public void setup(){
         User user = new User(1, "test_only", "test_only", "1", null, null, 0, null);
-        userRepository.save(user);
+        userDao.save(user);
     }
 
     @Test
-    void findByUser() {
+    public void findByUser() {
         String userID = "test_only";
         String content = "unit test findByUser";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
-        messageRepository.save(message);
-        messageRepository.save(message);
-        messageRepository.save(message);
+        messageDao.save(message);
+        messageDao.save(message);
+        messageDao.save(message);
         System.out.println("插入三条留言");
 
         Integer pageNum = 1;
         Pageable pageable= PageRequest.of(pageNum - 1, 5);
         Page<Message> messagePage = messageService.findByUser(userID, pageable);
-        System.out.println(messagePage);
+//        System.out.println(messagePage);
         List<MessageVo> actualMessageList = messageVoService.returnVo(messagePage.getContent());
         Assert.assertEquals(3, actualMessageList.size());
 
-        Iterator<Message> expectedMessageList = messageRepository.findMessageByUserID(userID).iterator();
+        Iterator<Message> expectedMessageList = messageDao.findAllByUserID(userID, pageable).iterator();
         for(MessageVo actualMessageVo:actualMessageList) {
             Message expectedMessage = expectedMessageList.next();
             Assert.assertEquals(userID, actualMessageVo.getUserID());
             Assert.assertEquals(expectedMessage.getMessageID(), actualMessageVo.getMessageID());
             Assert.assertEquals(expectedMessage.getContent(), actualMessageVo.getContent());
-            messageRepository.deleteById(actualMessageVo.getMessageID());
+            messageDao.deleteById(actualMessageVo.getMessageID());
         }
     }
 
     @Test
-    void create() {
+    public void create() {
         String userID = "test_only";
         String content = "unit test create";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
         Integer actualMessageID = messageService.create(message);
-        Message actualMessage = messageRepository.findById(actualMessageID).get();
+        Message actualMessage = messageDao.findById(actualMessageID).get();
         Assert.assertEquals(content, actualMessage.getContent());
         Assert.assertEquals(userID, actualMessage.getUserID());
-        messageRepository.deleteById(actualMessageID);
+        messageDao.deleteById(actualMessageID);
     }
 
 
     @Test
-    void delById() {
+    public void delById() {
         String userID = "test_only";
         String content = "unit test delById";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
         Integer actualMessageID = messageService.create(message);
-        Assert.assertTrue(messageRepository.findById(actualMessageID).isPresent());
+        Assert.assertTrue(messageDao.findById(actualMessageID).isPresent());
         messageService.delById(actualMessageID);
-        Assert.assertFalse(messageRepository.findById(actualMessageID).isPresent());
+        Assert.assertFalse(messageDao.findById(actualMessageID).isPresent());
     }
 
 
     @Test
-    void confirmMessage() {
+    public void confirmMessage() {
         String userID = "test_only";
         String content = "unit test confirmMessage";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
         Integer actualMessageID = messageService.create(message);
         messageService.confirmMessage(actualMessageID);
-        Message actualMessage = messageRepository.findById(actualMessageID).get();
+        Message actualMessage = messageDao.findById(actualMessageID).get();
         Assert.assertEquals(2, actualMessage.getState());
-        messageRepository.deleteById(actualMessageID);
+        messageDao.deleteById(actualMessageID);
     }
 
     @Test
-    void rejectMessage() {
+    public void rejectMessage() {
         String userID = "test_only";
         String content = "unit test rejectMessage";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
         Integer actualMessageID = messageService.create(message);
         messageService.rejectMessage(actualMessageID);
-        Message actualMessage = messageRepository.findById(actualMessageID).get();
+        Message actualMessage = messageDao.findById(actualMessageID).get();
         Assert.assertEquals(3, actualMessage.getState());
-        messageRepository.deleteById(actualMessageID);
+        messageDao.deleteById(actualMessageID);
     }
 
     @Test
-    void findWaitState() {
+    public void findWaitState() {
         String userID = "test_only";
         String content = "unit test findWaitState";
         Message message = new Message(1, userID, content, LocalDateTime.now(), 1);
@@ -133,18 +131,22 @@ public class MessageServiceTest {
         Integer pageNum = 1;
         Pageable pageable= PageRequest.of(pageNum - 1, 5);
         Page<Message> messagePage = messageService.findWaitState(pageable);
-        Iterator<Message> expectedMessageList = messageRepository.findMessageByUserIDAndState(userID, 1).iterator();
+        Iterator<Message> expectedMessageList = messageDao.findAllByUserID(userID, pageable).iterator();
         for (Iterator<Message> it = expectedMessageList; it.hasNext(); ) {
             Message expected = it.next();
+            // 跳过已审核或已拒绝的留言
+            if (expected.getState() != 1) {
+                continue;
+            }
             Integer expectedMessageID = expected.getMessageID();
             Assert.assertEquals(expectedMessageID, actualWaitMessageID);
         }
-        messageRepository.deleteById(actualWaitMessageID);
-        messageRepository.deleteById(actualPassMessageID);
+        messageDao.deleteById(actualWaitMessageID);
+        messageDao.deleteById(actualPassMessageID);
     }
 
     @Test
-    void findPassState() {
+    public void findPassState() {
         String userID = "test_only";
         String content = "unit test findPassState";
         Message message = new Message(999, userID, content, LocalDateTime.now(), 1);
@@ -154,13 +156,17 @@ public class MessageServiceTest {
         Integer pageNum = 1;
         Pageable pageable= PageRequest.of(pageNum - 1, 5);
         Page<Message> messagePage = messageService.findPassState(pageable);
-        Iterator<Message> expectedMessageList = messageRepository.findMessageByUserIDAndState(userID, 2).iterator();
+        Iterator<Message> expectedMessageList = messageDao.findAllByUserID(userID, pageable).iterator();
         for (Iterator<Message> it = expectedMessageList; it.hasNext(); ) {
             Message expected = it.next();
+            // 跳过未审核或已拒绝的留言
+            if (expected.getState() != 2) {
+                continue;
+            }
             Integer expectedMessageID = expected.getMessageID();
             Assert.assertEquals(expectedMessageID, actualPassMessageID);
         }
-        messageRepository.deleteById(actualWaitMessageID);
-        messageRepository.deleteById(actualPassMessageID);
+        messageDao.deleteById(actualWaitMessageID);
+        messageDao.deleteById(actualPassMessageID);
     }
 }
