@@ -4,7 +4,9 @@ import com.demo.dao.UserDao;
 import com.demo.entity.Message;
 import com.demo.entity.User;
 import com.demo.service.UserService;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,6 +27,19 @@ public class UserServiceTest {
 
     @Autowired
     private UserDao userDao;
+
+    @Before
+    public void setup(){
+        User user = new User(999, "test_only", "test_only", "1", null, null, 0, null);
+        userDao.save(user);
+        System.out.println("创建用户");
+    }
+
+    @After
+    public void teardown() {
+        User user = userDao.findByUserID("test_only");
+        userDao.delete(user);
+    }
 
     @Test
     public void findByUserID() {
@@ -84,7 +99,7 @@ public class UserServiceTest {
         userDao.save(user);
         int userID = userDao.findByUserID("test2").getId();
         userService.delByID(userID);
-        Assert.assertNotNull(userDao.findById(userID));
+        Assert.assertNull(userDao.findById(userID));
     }
 
     @Test

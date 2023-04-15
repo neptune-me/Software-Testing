@@ -7,10 +7,13 @@ import com.demo.entity.User;
 import com.demo.entity.vo.MessageVo;
 import com.demo.service.MessageService;
 import com.demo.service.MessageVoService;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 //import org.junit.jupiter.api.Test;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,8 +43,14 @@ public class MessageServiceTest {
 
     @Before
     public void setup(){
-        User user = new User(1, "test_only", "test_only", "1", null, null, 0, null);
+        User user = new User(999, "test_only", "test_only", "1", null, null, 0, null);
         userDao.save(user);
+    }
+
+    @After
+    public void teardown() {
+        User user = userDao.findByUserID("test_only");
+        userDao.delete(user);
     }
 
     @Test
@@ -57,7 +66,6 @@ public class MessageServiceTest {
         Integer pageNum = 1;
         Pageable pageable= PageRequest.of(pageNum - 1, 5);
         Page<Message> messagePage = messageService.findByUser(userID, pageable);
-//        System.out.println(messagePage);
         List<MessageVo> actualMessageList = messageVoService.returnVo(messagePage.getContent());
         Assert.assertEquals(3, actualMessageList.size());
 
