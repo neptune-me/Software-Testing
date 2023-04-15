@@ -1,21 +1,21 @@
 package com.demo.service.impl;
 
 import com.demo.dao.OrderDao;
-
 import com.demo.dao.VenueDao;
-import com.demo.entity.Venue;
 import com.demo.entity.Order;
+import com.demo.entity.Venue;
 import com.demo.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderDao orderDao;
@@ -25,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findById(int OrderID) {
-        return orderDao.getOne(OrderID);
+        return orderDao.findById(OrderID).orElse(null);
     }
 
     @Override
