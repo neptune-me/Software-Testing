@@ -101,7 +101,7 @@ class AdminNewsControllerTest {
     void modifyNews() throws Exception {
         // 模拟要修改的新闻对象
         News news = new News();
-        news.setId(1);
+//        news.setId(1);
         news.setNewsID(1);
         news.setTitle("Old title");
         news.setContent("Old content");

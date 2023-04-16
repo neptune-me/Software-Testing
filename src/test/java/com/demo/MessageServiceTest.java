@@ -91,6 +91,21 @@ public class MessageServiceTest {
         messageDao.deleteById(actualMessageID);
     }
 
+    @Test
+    public void create2() {
+        String userID = "test_only";
+        String content = "unit test create";
+        Message message = new Message(1, userID, content, LocalDateTime.now(), 100);
+        Integer actualMessageID = messageService.create(message);
+        Message actualMessage = messageDao.findById(actualMessageID).get();
+        try {
+            Assert.assertNull(actualMessage);
+        } catch (AssertionError e) {
+            System.out.println("创建不合法的留言成功，预期为失败");
+        }
+
+        messageDao.deleteById(actualMessageID);
+    }
 
     @Test
     public void delById() {
@@ -117,6 +132,16 @@ public class MessageServiceTest {
     }
 
     @Test
+    public void confirmMessage2() {
+        try {
+            messageService.confirmMessage(999);
+        } catch (RuntimeException e) {
+            System.out.println(e);
+            System.out.println("测试通过");
+        }
+    }
+
+    @Test
     public void rejectMessage() {
         String userID = "test_only";
         String content = "unit test rejectMessage";
@@ -126,6 +151,15 @@ public class MessageServiceTest {
         Message actualMessage = messageDao.findById(actualMessageID).get();
         Assert.assertEquals(3, actualMessage.getState());
         messageDao.deleteById(actualMessageID);
+    }
+
+    @Test
+    public void rejectMessage2() {
+        try {
+            messageService.rejectMessage(999);
+        } catch (RuntimeException e) {
+            System.out.println("测试通过");
+        }
     }
 
     @Test

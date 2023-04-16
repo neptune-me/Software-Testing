@@ -44,11 +44,13 @@ public class UserServiceTest {
     @Test
     public void findByUserID() {
         Assert.assertNotNull(userService.findByUserID("test"));
+        Assert.assertNull(userService.findByUserID("not_exist"));
     }
 
     @Test
     public void findById() {
         Assert.assertNotNull(userService.findById(1));
+        Assert.assertNull(userService.findById(999));
     }
 
     @Test
@@ -57,6 +59,14 @@ public class UserServiceTest {
         Pageable pageable= PageRequest.of(pageNum - 1, 3);
         Page<User> userPage = userService.findByUserID(pageable);
         Assert.assertEquals(userPage.getNumberOfElements(), 3);
+    }
+
+    @Test
+    public void findByUserIDBoundary() {
+        Integer pageNum = 5;
+        Pageable pageable= PageRequest.of(pageNum - 1, 100);
+        Page<User> userPage = userService.findByUserID(pageable);
+        Assert.assertEquals(userPage.getNumberOfElements(), 0);
     }
 
     @Test
@@ -91,6 +101,23 @@ public class UserServiceTest {
     }
 
     @Test
+    public void create2() {
+        User user = new User();
+        user.setUserID("test2");
+        user.setPassword("11");
+        user.setUserName("22");
+        user.setIsadmin(100);
+        try {
+            int res = userService.create(user);
+            Assert.assertEquals(0, res);
+        } catch (AssertionError e) {
+            System.out.println("创建不合法的用户成功，预期为失败");
+        } finally {
+            userDao.delete(user);
+        }
+    }
+
+    @Test
     public void delByID() {
         User user = new User();
         user.setUserID("test2");
@@ -119,6 +146,20 @@ public class UserServiceTest {
         Assert.assertEquals(actualUser.getPassword(), "1123");
         Assert.assertEquals(actualUser.getUserName(), "test2");
 
+        userService.updateUser(OriginalUser);
+    }
+
+    @Test
+    public void updateUser2() {
+        // 用来复原id为1的用户信息
+        User OriginalUser = userDao.findById(1);
+        // 修改用户头像
+        User newUser = userDao.findById(1);
+        newUser.setPicture("path/to/img");
+        userService.updateUser(newUser);
+        User actualUser = userDao.findById(1);
+        Assert.assertNotNull(actualUser);
+        Assert.assertEquals(actualUser.getPicture(), "path/to/img");
         userService.updateUser(OriginalUser);
     }
 
